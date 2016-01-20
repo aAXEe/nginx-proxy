@@ -13,7 +13,7 @@ ExecStart=/usr/bin/docker run --name=reverse-proxy \
     -v /srv/docker/reverse-proxy/le-webroot:/app/letsencrypt \
     -v /var/run/docker.sock:/tmp/docker.sock \
     --cap-drop=NET_RAW \
-    openseamap/nginx-proxy
+    openseamap/nginx-proxy:master
 ExecStop=/usr/bin/docker pull openseamap/nginx-proxy:master
 
 [Install]
