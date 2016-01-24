@@ -14,7 +14,7 @@ ExecStart=/usr/bin/docker run --name=reverse-proxy \
     -v /var/run/docker.sock:/tmp/docker.sock \
     --cap-drop=NET_RAW \
     openseamap/nginx-proxy:master
-ExecStop=/usr/bin/docker pull openseamap/nginx-proxy:master
+ExecReload=/usr/bin/docker pull openseamap/nginx-proxy:master
 
 [Install]
 WantedBy=multi-user.target
