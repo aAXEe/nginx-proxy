@@ -10,7 +10,7 @@ ExecStart=/usr/bin/docker run --name=letsencrypt \
     --rm=true \
     -v /srv/docker/reverse-proxy:/etc/nginx/certs:rw \
     --volumes-from reverse-proxy \
-    -v /var/run/docker.sock:/tmp/docker.sock:ro \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
     jrcs/letsencrypt-nginx-proxy-companion
 ExecReload=/usr/bin/docker pull jrcs/letsencrypt-nginx-proxy-companion
 
