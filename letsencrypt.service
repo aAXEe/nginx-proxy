@@ -1,0 +1,18 @@
+[Unit]
+Description=LetsEncrypt companion container for nginx-proxy
+After=docker.service reverse-proxy.service
+Requires=docker.service reverse-proxy.service
+
+[Service]
+Restart=always
+KillMode=control-group
+ExecStart=/usr/bin/docker run --name=letsencrypt \
+    --rm=true \
+    -v /srv/docker/reverse-proxy:/etc/nginx/certs:rw \
+    --volumes-from reverse-proxy \
+    -v /var/run/docker.sock:/tmp/docker.sock:ro \
+    jrcs/letsencrypt-nginx-proxy-companion
+ExecReload=/usr/bin/docker pull jrcs/letsencrypt-nginx-proxy-companion
+
+[Install]
+WantedBy=multi-user.target

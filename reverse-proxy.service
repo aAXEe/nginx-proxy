@@ -6,12 +6,12 @@ Requires=docker.service
 [Service]
 Restart=always
 KillMode=control-group
-ExecStartPre=-/bin/mkdir -p /srv/docker/reverse-proxy/le-webroot/.well-known/acme-challenge
 ExecStart=/usr/bin/docker run --name=reverse-proxy \
     --memory=64M --rm=true -p 80:80 -p 443:443 \
-    -v /srv/docker/reverse-proxy:/etc/nginx/certs \
-    -v /srv/docker/reverse-proxy/le-webroot:/app/letsencrypt \
-    -v /var/run/docker.sock:/tmp/docker.sock \
+    -v /srv/docker/reverse-proxy:/etc/nginx/certs:ro \
+    -v /etc/nginx/vhost.d \
+    -v /usr/share/nginx/html \
+    -v /var/run/docker.sock:/tmp/docker.sock:ro \
     --cap-drop=NET_RAW \
     openseamap/nginx-proxy:master
 ExecReload=/usr/bin/docker pull openseamap/nginx-proxy:master
