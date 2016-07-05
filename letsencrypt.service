@@ -6,6 +6,7 @@ Requires=docker.service reverse-proxy.service
 [Service]
 Restart=always
 KillMode=control-group
+ExecStartPre=-/usr/bin/docker rm letsencrypt
 ExecStart=/usr/bin/docker run --name=letsencrypt \
     --rm=true \
     -v /srv/docker/reverse-proxy:/etc/nginx/certs:rw \
