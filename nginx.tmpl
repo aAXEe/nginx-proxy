@@ -133,6 +133,9 @@ upstream {{ $host }} {
 {{/* Get the VIRTUAL_PROTO defined by containers w/ the same vhost, falling back to "http" */}}
 {{ $proto := or (first (groupByKeys $containers "Env.VIRTUAL_PROTO")) "http" }}
 
+{{/* Get the HTTPS_METHOD defined by containers w/ the same vhost, falling back to "noredirect" */}}
+{{ $https_method := or (first (groupByKeys $containers "Env.HTTPS_METHOD")) "noredirect" }}
+
 {{/* Get the first cert name defined by containers w/ the same vhost */}}
 {{ $certName := (first (groupByKeys $containers "Env.CERT_NAME")) }}
 
@@ -146,12 +149,16 @@ upstream {{ $host }} {
 {{/* Use the cert specifid on the container or fallback to the best vhost match */}}
 {{ $cert := (coalesce $certName $vhostCert) }}
 
-{{ if (and (ne $cert "") (exists (printf "/etc/nginx/certs/%s.crt" $cert)) (exists (printf "/etc/nginx/certs/%s.key" $cert))) }}
+{{ $is_https := (and (ne $cert "") (exists (printf "/etc/nginx/certs/%s.crt" $cert)) (exists (printf "/etc/nginx/certs/%s.key" $cert))) }}
 
+{{ if $is_https }}
+
+{{ if eq $https_method "redirect" }}
 server {
     server_name {{ $host }};
     return 301 https://$host$request_uri;
 }
+{{ end }}
 
 server {
     server_name {{ $host }};
@@ -172,7 +179,9 @@ server {
     ssl_certificate /etc/nginx/certs/{{ (printf "%s.crt" $cert) }};
     ssl_certificate_key /etc/nginx/certs/{{ (printf "%s.key" $cert) }};
 
+    {{ if (ne $https_method "noredirect") }}
     add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
+    {{ end }}
     add_header X-Frame-Options DENY;
     add_header X-Content-Type-Options nosniff;
     add_header X-XSS-Protection "1; mode=block";
@@ -209,7 +218,9 @@ server {
         {{ end }}
     }
 }
-{{ else }}
+{{ end }}
+
+{{ if or (not $is_https) (eq $https_method "noredirect") }}
 
 server {
     server_name {{ $host }};

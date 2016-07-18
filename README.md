@@ -106,6 +106,15 @@ to establish a connection.  A self-signed or generic cert named `default.crt` an
 will allow a client browser to make a SSL connection (likely w/ a warning) and subsequently receive
 a 503.
 
+To serve traffic in both SSL and non-SSL modes without redirecting to SSL, you can include the
+environment variable `HTTPS_METHOD=noredirect` (the default is `HTTPS_METHOD=noredirect`). To enable the redirect set `HTTPS_METHOD=redirect`.
+`HTTPS_METHOD` must be specified
+on each container for which you want to override the default behavior.  If `HTTPS_METHOD=noredirect` is
+used, Strict Transport Security (HSTS) is disabled to prevent HTTPS users from being redirected by the
+client.  If you cannot get to the HTTP site after changing this setting, your browser has probably cached
+the HSTS policy and is automatically redirecting you back to HTTPS.  You will need to clear your browser's
+HSTS cache or use an incognito window / different browser.
+
 ### Basic Authentication Support
 
 In order to be able to securize your virtual host, you have to create a file named as its equivalent VIRTUAL_HOST variable on directory
